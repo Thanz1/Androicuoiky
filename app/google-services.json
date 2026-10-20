@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "407589375963",
+    "project_id": "androicuoiky-tdmu",
+    "storage_bucket": "androicuoiky-tdmu.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:407589375963:android:1e4e62eb1b1870865fa1fe",
+        "android_client_info": {
+          "package_name": "com.example.androicuoiky"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCx1aiMPDzAlanVD1nD4olynmS1CKmFK5c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

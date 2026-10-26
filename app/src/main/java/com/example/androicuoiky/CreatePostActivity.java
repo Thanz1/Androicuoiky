@@ -59,7 +59,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
         // Khởi tạo Firebase
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.firestore();
+        db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
 
         // Ánh xạ View

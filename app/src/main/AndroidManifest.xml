@@ -47,6 +47,11 @@
             android:name=".FriendsActivity"
             android:exported="false"
             android:label="Danh sách bạn bè" />
+        <activity
+            android:name=".ChatActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            android:label="Trò chuyện" />
     </application>
 
 </manifest>

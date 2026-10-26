@@ -1,12 +1,16 @@
 package com.example.androicuoiky;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,14 +30,21 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class AuthActivity extends AppCompatActivity {
 
+    private static final String PREFS_NAME = "AuthPrefs";
+    private static final String KEY_REMEMBER_EMAIL = "remembered_email";
+    private static final String KEY_IS_REMEMBERED = "is_remembered";
+
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private GoogleSignInClient mGoogleSignInClient;
     private boolean isRegisterMode = false;
 
     private EditText etFullName, etStudentId, etEmail, etPassword;
+    private CheckBox cbRememberEmail;
     private Button btnSubmitAuth, btnGoogleSignIn;
     private TextView tvSwitchMode, tvHeader;
+
+    private SharedPreferences sharedPreferences;
 
     // Bộ nhận kết quả phản hồi khi chọn tài khoản Google
     private final ActivityResultLauncher<Intent> googleSignInLauncher =
@@ -58,6 +69,7 @@ public class AuthActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         // Nếu người dùng đã đăng nhập từ trước thì vào thẳng MainActivity
         if (mAuth.getCurrentUser() != null) {
@@ -77,10 +89,14 @@ public class AuthActivity extends AppCompatActivity {
         etStudentId = findViewById(R.id.etStudentId);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
+        cbRememberEmail = findViewById(R.id.cbRememberEmail);
         btnSubmitAuth = findViewById(R.id.btnSubmitAuth);
         btnGoogleSignIn = findViewById(R.id.btnGoogleSignIn);
         tvSwitchMode = findViewById(R.id.tvSwitchMode);
         tvHeader = findViewById(R.id.tvHeader);
+
+        // Khôi phục email đăng nhập lần cuối nếu đã được ghi nhớ trước đó
+        loadRememberedEmail();
 
         // Chuyển đổi giữa chế độ Đăng nhập và Đăng ký
         tvSwitchMode.setOnClickListener(v -> toggleMode());
@@ -95,6 +111,28 @@ public class AuthActivity extends AppCompatActivity {
         });
     }
 
+    private void loadRememberedEmail() {
+        boolean isRemembered = sharedPreferences.getBoolean(KEY_IS_REMEMBERED, false);
+        if (isRemembered) {
+            String savedEmail = sharedPreferences.getString(KEY_REMEMBER_EMAIL, "");
+            etEmail.setText(savedEmail);
+            cbRememberEmail.setChecked(true);
+            etPassword.requestFocus(); // Chuyển con trỏ xuống ô mật khẩu cho tiện thao tác
+        }
+    }
+
+    private void saveEmailPreference(String email, boolean shouldRemember) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (shouldRemember) {
+            editor.putString(KEY_REMEMBER_EMAIL, email);
+            editor.putBoolean(KEY_IS_REMEMBERED, true);
+        } else {
+            editor.remove(KEY_REMEMBER_EMAIL);
+            editor.putBoolean(KEY_IS_REMEMBERED, false);
+        }
+        editor.apply();
+    }
+
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
@@ -105,11 +143,16 @@ public class AuthActivity extends AppCompatActivity {
                         String name = firebaseUser.getDisplayName() != null ? firebaseUser.getDisplayName() : "Sinh viên";
                         String email = firebaseUser.getEmail() != null ? firebaseUser.getEmail() : "";
 
+                        // Lưu lại email Google nếu checkbox đang được bật
+                        if (cbRememberEmail.isChecked()) {
+                            saveEmailPreference(email, true);
+                        }
+
                         // Kiểm tra xem user này đã tồn tại trong Firestore chưa
                         db.collection("users").document(uid).get()
                                 .addOnSuccessListener(snapshot -> {
                                     if (!snapshot.exists()) {
-                                        User newUser = new User(uid, name, email, "");
+                                        User newUser = new User(uid, email, name, "", "", "student", "");
                                         db.collection("users").document(uid).set(newUser);
                                     }
                                     Toast.makeText(this, "Đăng nhập Google thành công!", Toast.LENGTH_SHORT).show();
@@ -130,6 +173,7 @@ public class AuthActivity extends AppCompatActivity {
             tvHeader.setText("ĐĂNG KÝ TÀI KHOẢN");
             etFullName.setVisibility(View.VISIBLE);
             etStudentId.setVisibility(View.VISIBLE);
+            cbRememberEmail.setVisibility(View.GONE); // Đăng ký thì không cần hiện ô ghi nhớ
             btnSubmitAuth.setText("Đăng ký");
             btnGoogleSignIn.setVisibility(View.GONE);
             tvSwitchMode.setText("Đã có tài khoản? Bấm để Đăng nhập");
@@ -137,6 +181,7 @@ public class AuthActivity extends AppCompatActivity {
             tvHeader.setText("ĐĂNG NHẬP");
             etFullName.setVisibility(View.GONE);
             etStudentId.setVisibility(View.GONE);
+            cbRememberEmail.setVisibility(View.VISIBLE);
             btnSubmitAuth.setText("Đăng nhập");
             btnGoogleSignIn.setVisibility(View.VISIBLE);
             tvSwitchMode.setText("Chưa có tài khoản? Bấm để Đăng ký");
@@ -163,7 +208,7 @@ public class AuthActivity extends AppCompatActivity {
             mAuth.createUserWithEmailAndPassword(email, pass)
                     .addOnSuccessListener(authResult -> {
                         String uid = authResult.getUser().getUid();
-                        User newUser = new User(uid, name, email, studentId);
+                        User newUser = new User(uid, email, name, "", studentId, "student", "");
                         db.collection("users").document(uid).set(newUser)
                                 .addOnSuccessListener(unused -> {
                                     Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
@@ -172,8 +217,12 @@ public class AuthActivity extends AppCompatActivity {
                     })
                     .addOnFailureListener(e -> Toast.makeText(this, "Lỗi đăng ký: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         } else {
+            // Đăng nhập bằng Email/Password
             mAuth.signInWithEmailAndPassword(email, pass)
                     .addOnSuccessListener(authResult -> {
+                        // Lưu hoặc xóa email dựa trên trạng thái checkbox
+                        saveEmailPreference(email, cbRememberEmail.isChecked());
+
                         Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                         goToMainActivity();
                     })

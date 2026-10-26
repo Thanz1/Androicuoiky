@@ -56,7 +56,7 @@
                 android:textColor="#555555"
                 android:layout_marginBottom="6dp" />
 
-            <!-- Khung tác giả & Nút kết bạn -->
+            <!-- Khung tác giả, Nút Kết bạn và Nút Nhắn tin -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
                     android:textSize="14sp"
                     android:textColor="#1976D2" />
 
-                <!-- Nút kết bạn với tác giả bài đăng -->
+                <!-- Nút kết bạn -->
                 <Button
                     android:id="@+id/btnAddFriend"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -82,6 +82,20 @@
                     android:text="+ Kết bạn"
                     android:textSize="12sp"
                     android:visibility="gone"
+                    android:paddingVertical="0dp"
+                    android:paddingHorizontal="10dp" />
+
+                <!-- Nút Nhắn tin kiểu Messenger -->
+                <Button
+                    android:id="@+id/btnOpenChat"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Nhắn tin"
+                    android:textColor="#0084FF"
+                    android:textSize="12sp"
+                    android:visibility="gone"
+                    android:layout_marginStart="6dp"
                     android:paddingVertical="0dp"
                     android:paddingHorizontal="10dp" />
             </LinearLayout>
@@ -95,7 +109,7 @@
                 android:textColor="#212121"
                 android:layout_marginBottom="14dp" />
 
-            <!-- Nút xử lý trạng thái & xóa bài của chủ sở hữu -->
+            <!-- Nút xử lý trạng thái & xóa bài của chủ bài -->
             <Button
                 android:id="@+id/btnMarkResolved"
                 android:layout_width="match_parent"
@@ -279,7 +293,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@null"
+                android:background="@android:color/transparent"
                 android:hint="Viết bình luận..."
                 android:padding="10dp"
                 android:textSize="14sp"

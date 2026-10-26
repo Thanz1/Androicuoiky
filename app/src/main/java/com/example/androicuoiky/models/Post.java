@@ -2,6 +2,10 @@ package com.example.androicuoiky.models;
 
 import com.google.firebase.Timestamp;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 public class Post {
     private String postId;
     private String userId;        // ID của người đăng thực tế (Admin luôn tra cứu được)
@@ -15,7 +19,7 @@ public class Post {
     private String status;        // "PENDING" (đang tìm/chờ trả), "RESOLVED" (đã trả/đã nhận lại)
     private boolean isAnonymous;  // True: Ẩn danh với người dùng thường (chỉ Admin thấy UID/Tên thật)
     private boolean isScoreApproved; // True: Đã được Admin duyệt cộng điểm thi đua cho lớp
-    private Timestamp createdAt;
+    private Object createdAt;
 
     // Bắt buộc constructor rỗng cho Firestore
     public Post() {
@@ -23,7 +27,7 @@ public class Post {
 
     public Post(String postId, String userId, String authorName, String classId, String title,
                 String description, String location, String category, String imageUrl,
-                String status, boolean isAnonymous, boolean isScoreApproved, Timestamp createdAt) {
+                String status, boolean isAnonymous, boolean isScoreApproved, Object createdAt) {
         this.postId = postId;
         this.userId = userId;
         this.authorName = authorName;
@@ -136,23 +140,34 @@ public class Post {
         isScoreApproved = scoreApproved;
     }
 
-    public Timestamp getCreatedAt() {
+    public Object getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(Object createdAt) {
         this.createdAt = createdAt;
     }
+
+    public Date getCreatedAtDate() {
+        if (createdAt instanceof Timestamp) {
+            return ((Timestamp) createdAt).toDate();
+        } else if (createdAt instanceof Long) {
+            return new Date((Long) createdAt);
+        } else if (createdAt instanceof Date) {
+            return (Date) createdAt;
+        }
+        return new Date();
+    }
     // Thêm trường này vào trong class Post:
-    private java.util.Map<String, String> reactions = new java.util.HashMap<>();
+    private Map<String, String> reactions = new HashMap<>();
 
     // Thêm Getter và Setter:
-    public java.util.Map<String, String> getReactions() {
-        if (reactions == null) reactions = new java.util.HashMap<>();
+    public Map<String, String> getReactions() {
+        if (reactions == null) reactions = new HashMap<>();
         return reactions;
     }
 
-    public void setReactions(java.util.Map<String, String> reactions) {
+    public void setReactions(Map<String, String> reactions) {
         this.reactions = reactions;
     }
 }

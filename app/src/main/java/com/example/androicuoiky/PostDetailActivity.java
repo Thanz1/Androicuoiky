@@ -1,11 +1,13 @@
 package com.example.androicuoiky;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,6 +31,7 @@ import com.bumptech.glide.Glide;
 import com.example.androicuoiky.adapters.CommentAdapter;
 import com.example.androicuoiky.models.Comment;
 import com.example.androicuoiky.models.Post;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -39,7 +43,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -49,7 +52,7 @@ public class PostDetailActivity extends AppCompatActivity {
     private TextView tvDetailTitle, tvDetailCategory, tvDetailLocation, tvDetailAuthor, tvDetailDescription;
     private TextView tvReactionCount, tvCommentCount, tvReactionIcon, tvReactionText;
     private ImageView ivDetailImage, ivCommentPreview;
-    private Button btnMarkResolved, btnDeletePost, btnAddFriend;
+    private Button btnMarkResolved, btnDeletePost, btnAddFriend, btnOpenChat;
     private LinearLayout btnReaction, btnCommentAction;
     private RelativeLayout layoutCommentPreview;
     private EditText etComment;
@@ -107,6 +110,7 @@ public class PostDetailActivity extends AppCompatActivity {
         btnMarkResolved = findViewById(R.id.btnMarkResolved);
         btnDeletePost = findViewById(R.id.btnDeletePost);
         btnAddFriend = findViewById(R.id.btnAddFriend);
+        btnOpenChat = findViewById(R.id.btnOpenChat);
 
         tvReactionCount = findViewById(R.id.tvReactionCount);
         tvCommentCount = findViewById(R.id.tvCommentCount);
@@ -126,7 +130,8 @@ public class PostDetailActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         rvComments.setLayoutManager(new LinearLayoutManager(this));
-        commentAdapter = new CommentAdapter(this, commentList);
+        // Truyền callback mở User Profile Dialog khi click vào avatar comment
+        commentAdapter = new CommentAdapter(this, commentList, this::showUserProfileDialog);
         rvComments.setAdapter(commentAdapter);
     }
 
@@ -154,10 +159,12 @@ public class PostDetailActivity extends AppCompatActivity {
         btnMarkResolved.setOnClickListener(v -> markPostAsResolved());
         btnDeletePost.setOnClickListener(v -> deletePost());
 
-        // Bấm nút Kết bạn
-        btnAddFriend.setOnClickListener(v -> {
-            if (currentPost != null) {
-                addFriend(currentPost.getUserId());
+        btnOpenChat.setOnClickListener(v -> {
+            if (currentPost != null && !TextUtils.isEmpty(currentPost.getUserId())) {
+                Intent intent = new Intent(PostDetailActivity.this, ChatActivity.class);
+                intent.putExtra("RECEIVER_ID", currentPost.getUserId());
+                intent.putExtra("RECEIVER_NAME", currentPost.getAuthorName());
+                startActivity(intent);
             }
         });
     }
@@ -189,10 +196,10 @@ public class PostDetailActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         String currentUid = currentUser != null ? currentUser.getUid() : "";
 
-        // Xử lý hiển thị tác giả và nút Kết bạn
         if (post.isAnonymous()) {
             tvDetailAuthor.setText("Người đăng: Ẩn danh (Đã lưu ID kiểm duyệt)");
             btnAddFriend.setVisibility(View.GONE);
+            btnOpenChat.setVisibility(View.GONE);
         } else {
             String authorInfo = "Người đăng: " + post.getAuthorName();
             if (!TextUtils.isEmpty(post.getClassId())) {
@@ -200,20 +207,22 @@ public class PostDetailActivity extends AppCompatActivity {
             }
             tvDetailAuthor.setText(authorInfo);
 
-            // Chỉ hiện nút kết bạn nếu đây không phải là bài của chính mình
             if (!TextUtils.isEmpty(post.getUserId()) && !post.getUserId().equals(currentUid)) {
-                checkFriendStatus(post.getUserId());
+                btnOpenChat.setVisibility(View.VISIBLE);
+                updateFriendButton(btnAddFriend, post.getUserId());
             } else {
                 btnAddFriend.setVisibility(View.GONE);
+                btnOpenChat.setVisibility(View.GONE);
             }
         }
 
         if (!TextUtils.isEmpty(post.getImageUrl())) {
             ivDetailImage.setVisibility(View.VISIBLE);
             Glide.with(this).load(post.getImageUrl()).into(ivDetailImage);
+        } else {
+            ivDetailImage.setVisibility(View.GONE);
         }
 
-        // Quyền sửa/xóa bài của chính người tạo
         if (currentUid.equals(post.getUserId())) {
             btnDeletePost.setVisibility(View.VISIBLE);
             if (!"RESOLVED".equalsIgnoreCase(post.getStatus())) {
@@ -229,48 +238,90 @@ public class PostDetailActivity extends AppCompatActivity {
         updateReactionUI();
     }
 
-    // Kiểm tra xem đã kết bạn chưa để cập nhật text của nút
-    private void checkFriendStatus(String targetUserId) {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) return;
+    // Hiển thị Mini Profile Dialog khi bấm vào Avatar người comment
+    @SuppressLint("SetTextI18n")
+    private void showUserProfileDialog(String targetUserId) {
+        if (targetUserId == null) return;
 
-        db.collection("users").document(currentUser.getUid())
-                .collection("friends").document(targetUserId)
-                .get()
-                .addOnSuccessListener(doc -> {
-                    btnAddFriend.setVisibility(View.VISIBLE);
-                    if (doc.exists()) {
-                        btnAddFriend.setText("Bạn bè ✓");
-                        btnAddFriend.setEnabled(false);
-                    } else {
-                        btnAddFriend.setText("+ Kết bạn");
-                        btnAddFriend.setEnabled(true);
-                    }
-                });
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_user_preview, null);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        ShapeableImageView ivDialogAvatar = dialogView.findViewById(R.id.ivDialogAvatar);
+        TextView tvDialogName = dialogView.findViewById(R.id.tvDialogName);
+        TextView tvDialogClass = dialogView.findViewById(R.id.tvDialogClass);
+        Button btnDialogChat = dialogView.findViewById(R.id.btnDialogChat);
+        Button btnDialogFriend = dialogView.findViewById(R.id.btnDialogFriend);
+        Button btnDialogViewProfile = dialogView.findViewById(R.id.btnDialogViewProfile);
+
+        db.collection("users").document(targetUserId).get().addOnSuccessListener(doc -> {
+            if (!doc.exists()) return;
+            String name = doc.getString("fullName");
+            String avatar = doc.getString("avatarUrl");
+            String classId = doc.getString("classId");
+
+            tvDialogName.setText(name != null ? name : "Học sinh");
+            tvDialogClass.setText("Lớp: " + (classId != null ? classId : "Chưa rõ"));
+            if (avatar != null && !avatar.isEmpty()) {
+                Glide.with(this).load(avatar).into(ivDialogAvatar);
+            }
+
+            // Cập nhật trạng thái nút kết bạn có chờ duyệt
+            updateFriendButton(btnDialogFriend, targetUserId);
+
+            btnDialogChat.setOnClickListener(v -> {
+                dialog.dismiss();
+                Intent intent = new Intent(this, ChatActivity.class);
+                intent.putExtra("RECEIVER_ID", targetUserId);
+                intent.putExtra("RECEIVER_NAME", name);
+                startActivity(intent);
+            });
+
+            btnDialogViewProfile.setOnClickListener(v -> {
+                dialog.dismiss();
+                Toast.makeText(this, "Xem trang của " + name, Toast.LENGTH_SHORT).show();
+            });
+        });
+
+        dialog.show();
     }
 
-    // Gửi liên kết kết bạn 2 chiều vào Firestore
-    private void addFriend(String targetUserId) {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null || currentUser.getUid().equals(targetUserId)) return;
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("timestamp", Timestamp.now());
-
-        btnAddFriend.setEnabled(false);
-        db.collection("users").document(currentUser.getUid())
-                .collection("friends").document(targetUserId).set(data);
-
-        db.collection("users").document(targetUserId)
-                .collection("friends").document(currentUser.getUid()).set(data)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Đã thêm bạn bè thành công!", Toast.LENGTH_SHORT).show();
-                    btnAddFriend.setText("Bạn bè ✓");
-                })
-                .addOnFailureListener(e -> {
-                    btnAddFriend.setEnabled(true);
-                    Toast.makeText(this, "Lỗi kết bạn: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+    // Cập nhật trạng thái và hành vi của nút Kết bạn (3 trạng thái chuẩn)
+    @SuppressLint("SetTextI18n")
+    private void updateFriendButton(Button btn, String targetUserId) {
+        btn.setVisibility(View.VISIBLE);
+        FriendManager.checkStatus(targetUserId, (status, requestId) -> {
+            switch (status) {
+                case "SELF":
+                    btn.setVisibility(View.GONE);
+                    break;
+                case "FRIEND":
+                    btn.setText("Bạn bè ✓");
+                    btn.setBackgroundColor(Color.parseColor("#388E3C"));
+                    btn.setOnClickListener(v -> FriendManager.cancelOrRemove(targetUserId, () -> updateFriendButton(btn, targetUserId)));
+                    break;
+                case "SENT":
+                    btn.setText("Đã gửi lời mời ✕");
+                    btn.setBackgroundColor(Color.parseColor("#757575"));
+                    btn.setOnClickListener(v -> FriendManager.cancelOrRemove(targetUserId, () -> updateFriendButton(btn, targetUserId)));
+                    break;
+                case "RECEIVED":
+                    btn.setText("Chấp nhận ✓");
+                    btn.setBackgroundColor(Color.parseColor("#1877F2"));
+                    btn.setOnClickListener(v -> FriendManager.acceptRequest(targetUserId, () -> updateFriendButton(btn, targetUserId)));
+                    break;
+                default: // "NONE"
+                    btn.setText("+ Thêm bạn bè");
+                    btn.setBackgroundColor(Color.parseColor("#1877F2"));
+                    btn.setOnClickListener(v -> FriendManager.sendRequest(targetUserId, () -> updateFriendButton(btn, targetUserId)));
+                    break;
+            }
+        });
     }
 
     private void showReactionPopup(View anchorView) {
@@ -331,6 +382,7 @@ public class PostDetailActivity extends AppCompatActivity {
             if (reactions.containsKey(uid)) {
                 String type = reactions.get(uid);
                 if (type == null) type = "LIKE";
+
                 switch (type) {
                     case "LOVE":
                         tvReactionIcon.setText("❤️");
@@ -389,7 +441,9 @@ public class PostDetailActivity extends AppCompatActivity {
                 String fileName = "comments/" + UUID.randomUUID().toString() + ".jpg";
                 StorageReference ref = storage.getReference().child(fileName);
                 ref.putFile(commentImageUri)
-                        .addOnSuccessListener(task -> ref.getDownloadUrl().addOnSuccessListener(uri -> saveCommentToFirestore(uid, finalAuthor, content, uri.toString())))
+                        .addOnSuccessListener(task -> ref.getDownloadUrl().addOnSuccessListener(uri ->
+                                saveCommentToFirestore(uid, finalAuthor, content, uri.toString())
+                        ))
                         .addOnFailureListener(e -> {
                             btnSendComment.setEnabled(true);
                             Toast.makeText(this, "Lỗi tải ảnh lên: " + e.getMessage(), Toast.LENGTH_SHORT).show();

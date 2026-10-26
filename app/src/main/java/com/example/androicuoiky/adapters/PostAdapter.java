@@ -82,7 +82,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
         // Ngày đăng
         if (post.getCreatedAt() != null) {
-            holder.tvDate.setText(dateFormat.format(post.getCreatedAt().toDate()));
+            holder.tvDate.setText(dateFormat.format(post.getCreatedAtDate()));
         }
 
         // Load ảnh bằng Glide

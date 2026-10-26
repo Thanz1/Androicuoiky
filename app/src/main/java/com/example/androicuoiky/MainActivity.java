@@ -1,10 +1,12 @@
 package com.example.androicuoiky;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnFilterAll, btnFilterLost, btnFilterFound;
     private FloatingActionButton fabAddPost;
     private ShapeableImageView ivUserAvatar;
+    private ImageButton btnToolbarMessages;
 
     private PostAdapter postAdapter;
     private final List<Post> postList = new ArrayList<>();
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         btnFilterFound = findViewById(R.id.btnFilterFound);
         fabAddPost = findViewById(R.id.fabAddPost);
         ivUserAvatar = findViewById(R.id.ivUserAvatar);
+        btnToolbarMessages = findViewById(R.id.btnToolbarMessages);
 
         // 2. Cài đặt RecyclerView bài đăng
         rvPosts.setLayoutManager(new LinearLayoutManager(this));
@@ -71,13 +75,20 @@ public class MainActivity extends AppCompatActivity {
         // 3. Khởi tạo Avatar và Menu Dropdown
         setupAvatarDropdown();
 
-        // 4. Sự kiện chuyển màn hình đăng bài
+        // 4. Bấm nút tin nhắn tròn trên toolbar
+        btnToolbarMessages.setOnClickListener(v -> {
+            // Mở danh sách bạn bè để chọn người nhắn tin (hoặc mở ConversationsActivity)
+            Intent intent = new Intent(MainActivity.this, FriendsActivity.class);
+            startActivity(intent);
+        });
+
+        // 5. Sự kiện chuyển màn hình đăng bài
         fabAddPost.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, CreatePostActivity.class);
             startActivity(intent);
         });
 
-        // 5. Sự kiện lọc bài
+        // 6. Sự kiện lọc bài
         btnFilterAll.setOnClickListener(v -> applyFilter("ALL"));
         btnFilterLost.setOnClickListener(v -> applyFilter("LOST"));
         btnFilterFound.setOnClickListener(v -> applyFilter("FOUND"));
@@ -85,10 +96,34 @@ public class MainActivity extends AppCompatActivity {
         loadPostsFromFirestore();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mAuth.getCurrentUser() == null) {
+            Intent intent = new Intent(MainActivity.this, AuthActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Cập nhật trạng thái đang online khi vào app
+        UserStatusManager.setStatus(true);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Cập nhật trạng thái offline khi tạm dừng hoặc thoát app
+        UserStatusManager.setStatus(false);
+    }
+
     private void setupAvatarDropdown() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            // Lắng nghe thay đổi avatar từ Firestore
             db.collection("users").document(currentUser.getUid())
                     .addSnapshotListener((doc, e) -> {
                         if (doc != null && doc.exists()) {
@@ -102,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
                     });
         }
 
-        // Bấm vào avatar để hiển thị Popup Dropdown
         ivUserAvatar.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(MainActivity.this, v);
             popup.getMenuInflater().inflate(R.menu.menu_avatar_dropdown, popup.getMenu());
@@ -115,8 +149,17 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(MainActivity.this, FriendsActivity.class));
                     return true;
                 } else if (id == R.id.menu_logout) {
+                    // 1. Chuyển trạng thái sang offline trước khi đăng xuất
+                    UserStatusManager.setStatus(false);
+
+                    // 2. Đăng xuất khỏi Firebase Auth
                     mAuth.signOut();
-                    Toast.makeText(MainActivity.this, "Đã đăng xuất!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Đã đăng xuất thành công!", Toast.LENGTH_SHORT).show();
+
+                    // 3. Điều hướng về AuthActivity và xóa sạch ngăn xếp
+                    Intent intent = new Intent(MainActivity.this, AuthActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                     finish();
                     return true;
                 }
@@ -148,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void applyFilter(String filter) {
         currentFilter = filter;
         filteredList.clear();

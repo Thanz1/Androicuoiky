@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="end"
+    android:paddingStart="60dp"
+    android:paddingEnd="12dp"
+    android:paddingVertical="4dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvSentMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#0084FF"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="10dp"
+        android:text="Nội dung tin nhắn tôi gửi..." />
+
+    <TextView
+        android:id="@+id/tvSentTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="12:00"
+        android:textSize="10sp"
+        android:textColor="#9E9E9E"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="4dp" />
+
+</LinearLayout>

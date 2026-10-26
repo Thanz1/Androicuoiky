@@ -1,9 +1,47 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.AndroiCuoiKy" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Base.Theme.AndroiCuoiKy"
+        parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- Màu thương hiệu -->
+        <item name="colorPrimary">@color/sf_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/sf_primary_light</item>
+        <item name="colorOnPrimaryContainer">@color/sf_primary_dark</item>
+
+        <!-- Màu phụ -->
+        <item name="colorSecondary">@color/sf_secondary</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        <!-- Nền ứng dụng -->
+        <item name="android:colorBackground">@color/sf_background</item>
+        <item name="colorSurface">@color/sf_surface</item>
+        <item name="colorOnSurface">@color/sf_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/sf_text_secondary</item>
+
+        <!-- Trạng thái lỗi -->
+        <item name="colorError">@color/sf_danger</item>
+        <item name="colorOnError">@color/white</item>
+
+        <!-- Thanh trạng thái -->
+        <item name="android:statusBarColor">@color/sf_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <!-- Thanh điều hướng hệ thống -->
+        <item name="android:navigationBarColor">@color/sf_background</item>
+        <item name="android:windowLightNavigationBar">true</item>
+
+        <!-- Màu chữ -->
+        <item name="android:textColorPrimary">@color/sf_text_primary</item>
+        <item name="android:textColorSecondary">@color/sf_text_secondary</item>
+
+        <!-- Hiệu ứng nhấn -->
+        <item name="colorControlHighlight">@color/sf_primary_light</item>
+
     </style>
 
-    <style name="Theme.AndroiCuoiKy" parent="Base.Theme.AndroiCuoiKy" />
+    <style name="Theme.AndroiCuoiKy"
+        parent="Base.Theme.AndroiCuoiKy" />
+
 </resources>

@@ -18,8 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.androicuoiky.adapters.PostAdapter;
 import com.example.androicuoiky.models.Post;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -31,10 +33,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private MaterialCardView cardLost, cardFound;
     private RecyclerView rvPosts;
     private ProgressBar mainProgressBar;
     private Button btnFilterAll, btnFilterLost, btnFilterFound;
-    private FloatingActionButton fabAddPost;
+    private ExtendedFloatingActionButton fabAddPost;
     private ShapeableImageView ivUserAvatar;
     private ImageButton btnToolbarMessages;
 
@@ -62,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         fabAddPost = findViewById(R.id.fabAddPost);
         ivUserAvatar = findViewById(R.id.ivUserAvatar);
         btnToolbarMessages = findViewById(R.id.btnToolbarMessages);
+        cardLost = findViewById(R.id.cardLost);
+        cardFound = findViewById(R.id.cardFound);
 
         // 2. Cài đặt RecyclerView bài đăng
         rvPosts.setLayoutManager(new LinearLayoutManager(this));
@@ -76,11 +81,12 @@ public class MainActivity extends AppCompatActivity {
         setupAvatarDropdown();
 
         // 4. Bấm nút tin nhắn tròn trên toolbar
-        btnToolbarMessages.setOnClickListener(v -> {
-            // Mở danh sách bạn bè để chọn người nhắn tin (hoặc mở ConversationsActivity)
-            Intent intent = new Intent(MainActivity.this, FriendsActivity.class);
-            startActivity(intent);
-        });
+        if (btnToolbarMessages != null) {
+            btnToolbarMessages.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, FriendsActivity.class);
+                startActivity(intent);
+            });
+        }
 
         // 5. Sự kiện chuyển màn hình đăng bài
         fabAddPost.setOnClickListener(v -> {
@@ -93,12 +99,21 @@ public class MainActivity extends AppCompatActivity {
         btnFilterLost.setOnClickListener(v -> applyFilter("LOST"));
         btnFilterFound.setOnClickListener(v -> applyFilter("FOUND"));
 
+        if (cardLost != null) {
+            cardLost.setOnClickListener(v -> applyFilter("LOST"));
+        }
+
+        if (cardFound != null) {
+            cardFound.setOnClickListener(v -> applyFilter("FOUND"));
+        }
+
         loadPostsFromFirestore();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        // Kiểm tra phiên làm việc: chưa đăng nhập thì đẩy về AuthActivity
         if (mAuth.getCurrentUser() == null) {
             Intent intent = new Intent(MainActivity.this, AuthActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -110,14 +125,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Cập nhật trạng thái đang online khi vào app
+        // Cập nhật trạng thái trực tuyến
         UserStatusManager.setStatus(true);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        // Cập nhật trạng thái offline khi tạm dừng hoặc thoát app
+        // Cập nhật trạng thái ngoại tuyến khi ẩn/thoát app
         UserStatusManager.setStatus(false);
     }
 
@@ -149,14 +164,12 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(MainActivity.this, FriendsActivity.class));
                     return true;
                 } else if (id == R.id.menu_logout) {
-                    // 1. Chuyển trạng thái sang offline trước khi đăng xuất
+                    // Cập nhật offline trước khi đăng xuất
                     UserStatusManager.setStatus(false);
 
-                    // 2. Đăng xuất khỏi Firebase Auth
                     mAuth.signOut();
                     Toast.makeText(MainActivity.this, "Đã đăng xuất thành công!", Toast.LENGTH_SHORT).show();
 
-                    // 3. Điều hướng về AuthActivity và xóa sạch ngăn xếp
                     Intent intent = new Intent(MainActivity.this, AuthActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -183,8 +196,34 @@ public class MainActivity extends AppCompatActivity {
                     if (value != null) {
                         postList.clear();
                         for (QueryDocumentSnapshot doc : value) {
-                            Post post = doc.toObject(Post.class);
-                            postList.add(post);
+                            try {
+                                Post post = new Post();
+                                post.setPostId(doc.getString("postId"));
+                                post.setUserId(doc.getString("userId"));
+                                post.setAuthorName(doc.getString("authorName"));
+                                post.setClassId(doc.getString("classId"));
+                                post.setTitle(doc.getString("title"));
+                                post.setDescription(doc.getString("description"));
+                                post.setLocation(doc.getString("location"));
+                                post.setCategory(doc.getString("category"));
+                                post.setImageUrl(doc.getString("imageUrl"));
+                                post.setStatus(doc.getString("status"));
+                                Boolean isAnonymous = doc.getBoolean("isAnonymous");
+                                post.setAnonymous(isAnonymous != null ? isAnonymous : false);
+                                Boolean isScoreApproved = doc.getBoolean("isScoreApproved");
+                                post.setScoreApproved(isScoreApproved != null ? isScoreApproved : false);
+
+                                Object createdAtObj = doc.get("createdAt");
+                                if (createdAtObj instanceof Timestamp) {
+                                    post.setCreatedAt((Timestamp) createdAtObj);
+                                } else if (createdAtObj instanceof Long) {
+                                    post.setCreatedAt(new Timestamp(new java.util.Date((Long) createdAtObj)));
+                                } else {
+                                    post.setCreatedAt(Timestamp.now());
+                                }
+                                postList.add(post);
+                            } catch (Exception ignored) {
+                            }
                         }
                         applyFilter(currentFilter);
                     }

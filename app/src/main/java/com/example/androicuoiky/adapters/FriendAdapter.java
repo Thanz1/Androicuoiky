@@ -50,7 +50,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         if (!TextUtils.isEmpty(friend.getAvatarUrl())) {
             Glide.with(context).load(friend.getAvatarUrl()).into(holder.ivFriendAvatar);
         } else {
-            holder.ivFriendAvatar.setImageResource(R.drawable/ic_avatar_default);
+            holder.ivFriendAvatar.setImageResource(
+                    android.R.drawable.sym_def_app_icon
+            );
         }
 
         holder.btnRemoveFriend.setOnClickListener(v -> {

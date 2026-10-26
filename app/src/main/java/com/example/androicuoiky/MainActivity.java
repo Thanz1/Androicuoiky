@@ -16,23 +16,25 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.androicuoiky.adapters.PostAdapter;
 import com.example.androicuoiky.models.Post;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+    private MaterialCardView cardLost, cardFound;
     private RecyclerView rvPosts;
     private ProgressBar mainProgressBar;
     private Button btnFilterAll, btnFilterLost, btnFilterFound;
-    private FloatingActionButton fabAddPost;
+    private ExtendedFloatingActionButton fabAddPost;
     private ShapeableImageView ivUserAvatar;
 
     private PostAdapter postAdapter;
@@ -58,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
         btnFilterFound = findViewById(R.id.btnFilterFound);
         fabAddPost = findViewById(R.id.fabAddPost);
         ivUserAvatar = findViewById(R.id.ivUserAvatar);
-
+        cardLost = findViewById(R.id.cardLost);
+        cardFound = findViewById(R.id.cardFound);
         // 2. Cài đặt RecyclerView bài đăng
         rvPosts.setLayoutManager(new LinearLayoutManager(this));
         postAdapter = new PostAdapter(this, filteredList, post -> {
@@ -81,7 +84,15 @@ public class MainActivity extends AppCompatActivity {
         btnFilterAll.setOnClickListener(v -> applyFilter("ALL"));
         btnFilterLost.setOnClickListener(v -> applyFilter("LOST"));
         btnFilterFound.setOnClickListener(v -> applyFilter("FOUND"));
+// Nhấn thẻ tìm đồ thất lạc
+        cardLost.setOnClickListener(v -> {
+            applyFilter("LOST");
+        });
 
+// Nhấn thẻ đồ nhặt được
+        cardFound.setOnClickListener(v -> {
+            applyFilter("FOUND");
+        });
         loadPostsFromFirestore();
     }
 
@@ -140,8 +151,34 @@ public class MainActivity extends AppCompatActivity {
                     if (value != null) {
                         postList.clear();
                         for (QueryDocumentSnapshot doc : value) {
-                            Post post = doc.toObject(Post.class);
-                            postList.add(post);
+                            try {
+                                Post post = new Post();
+                                post.setPostId(doc.getString("postId"));
+                                post.setUserId(doc.getString("userId"));
+                                post.setAuthorName(doc.getString("authorName"));
+                                post.setClassId(doc.getString("classId"));
+                                post.setTitle(doc.getString("title"));
+                                post.setDescription(doc.getString("description"));
+                                post.setLocation(doc.getString("location"));
+                                post.setCategory(doc.getString("category"));
+                                post.setImageUrl(doc.getString("imageUrl"));
+                                post.setStatus(doc.getString("status"));
+                                Boolean isAnonymous = doc.getBoolean("isAnonymous");
+                                post.setAnonymous(isAnonymous != null ? isAnonymous : false);
+                                Boolean isScoreApproved = doc.getBoolean("isScoreApproved");
+                                post.setScoreApproved(isScoreApproved != null ? isScoreApproved : false);
+
+                                Object createdAtObj = doc.get("createdAt");
+                                if (createdAtObj instanceof Timestamp) {
+                                    post.setCreatedAt((Timestamp) createdAtObj);
+                                } else if (createdAtObj instanceof Long) {
+                                    post.setCreatedAt(new Timestamp(new java.util.Date((Long) createdAtObj)));
+                                } else {
+                                    post.setCreatedAt(Timestamp.now());
+                                }
+                                postList.add(post);
+                            } catch (Exception ignored) {
+                            }
                         }
                         applyFilter(currentFilter);
                     }

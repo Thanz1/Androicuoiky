@@ -109,7 +109,8 @@ public class AuthActivity extends AppCompatActivity {
                         db.collection("users").document(uid).get()
                                 .addOnSuccessListener(snapshot -> {
                                     if (!snapshot.exists()) {
-                                        User newUser = new User(uid, name, email, "");
+                                        User newUser = new User(uid, email, name, "", "", "student", ""
+                                        );
                                         db.collection("users").document(uid).set(newUser);
                                     }
                                     Toast.makeText(this, "Đăng nhập Google thành công!", Toast.LENGTH_SHORT).show();
@@ -163,7 +164,7 @@ public class AuthActivity extends AppCompatActivity {
             mAuth.createUserWithEmailAndPassword(email, pass)
                     .addOnSuccessListener(authResult -> {
                         String uid = authResult.getUser().getUid();
-                        User newUser = new User(uid, name, email, studentId);
+                        User newUser = new User(uid, email, name, "", "", "student", "");
                         db.collection("users").document(uid).set(newUser)
                                 .addOnSuccessListener(unused -> {
                                     Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();

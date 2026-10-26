@@ -1,5 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- Màu cơ bản -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Màu thương hiệu SchoolFind -->
+    <color name="sf_primary">#2563EB</color>
+    <color name="sf_primary_dark">#1D4ED8</color>
+    <color name="sf_primary_light">#DBEAFE</color>
+    <color name="sf_secondary">#0D9488</color>
+
+    <!-- Màu nền -->
+    <color name="sf_background">#F8FAFC</color>
+    <color name="sf_surface">#FFFFFF</color>
+    <color name="sf_surface_variant">#EFF6FF</color>
+
+    <!-- Màu chữ -->
+    <color name="sf_text_primary">#0F172A</color>
+    <color name="sf_text_secondary">#64748B</color>
+    <color name="sf_text_hint">#94A3B8</color>
+
+    <!-- Màu trạng thái -->
+    <color name="sf_success">#10B981</color>
+    <color name="sf_warning">#F59E0B</color>
+    <color name="sf_danger">#EF4444</color>
+
+    <!-- Màu nền trạng thái -->
+    <color name="sf_success_light">#D1FAE5</color>
+    <color name="sf_warning_light">#FEF3C7</color>
+    <color name="sf_danger_light">#FEE2E2</color>
+
+    <!-- Màu giao diện -->
+    <color name="sf_border">#E2E8F0</color>
+    <color name="sf_divider">#E5E7EB</color>
+
+    <!-- Màu điểm thưởng -->
+    <color name="sf_reward">#F59E0B</color>
+    <color name="sf_rank_gold">#EAB308</color>
+    <color name="sf_rank_silver">#94A3B8</color>
+    <color name="sf_rank_bronze">#CD7F32</color>
+
 </resources>

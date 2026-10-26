@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F5F5F5"
     android:padding="16dp">
 
     <LinearLayout
@@ -9,17 +11,28 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Tiêu đề màn hình -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ĐĂNG TIN TÌM / NHẶT ĐỒ"
-            android:textSize="20sp"
+            android:text="Đăng tin đồ thất lạc"
+            android:textColor="#212121"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp" />
+
+        <!-- Phân loại tin -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Loại tin:"
+            android:textColor="#333333"
+            android:textStyle="bold"
+            android:layout_marginBottom="6dp" />
 
         <RadioGroup
-            android:id="@+id/rgPostType"
+            android:id="@+id/rgCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -31,52 +44,104 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:checked="true"
-                android:text="Tôi bị mất đồ"/>
+                android:text="Tôi bị mất đồ (LOST)" />
 
             <RadioButton
                 android:id="@+id/rbFound"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Tôi nhặt được"/>
+                android:text="Tôi nhặt được đồ (FOUND)" />
         </RadioGroup>
 
-        <EditText
-            android:id="@+id/etTitle"
+        <!-- Tiêu đề bài đăng -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Tiêu đề (VD: Rơi thẻ sinh viên)"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="10dp"
+            app:boxBackgroundMode="filled">
 
-        <EditText
-            android:id="@+id/etLocation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Địa điểm (VD: Thư viện lầu 2, Khu B)"
-            android:layout_marginBottom="12dp"/>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Tên đồ vật (VD: Ví da, Chìa khóa xe, Thẻ SV)" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/etPhone"
+        <!-- Địa điểm rơi đồ -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Số điện thoại liên hệ"
-            android:inputType="phone"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="10dp"
+            app:boxBackgroundMode="filled">
 
-        <EditText
-            android:id="@+id/etDescription"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Địa điểm (VD: Thư viện tầng 2, Sân bóng, Khu A)" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Mô tả chi tiết -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Mô tả chi tiết đặc điểm nhận dạng..."
-            android:minLines="3"
-            android:gravity="top"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="12dp"
+            app:boxBackgroundMode="filled">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDescription"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:gravity="top"
+                android:hint="Mô tả chi tiết đặc điểm nhận dạng..."
+                android:inputType="textMultiLine" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Xem trước và chọn ảnh -->
+        <ImageView
+            android:id="@+id/ivPreview"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:background="#E0E0E0"
+            android:contentDescription="Ảnh minh họa"
+            android:layout_marginBottom="8dp" />
 
         <Button
-            android:id="@+id/btnSubmit"
+            android:id="@+id/btnSelectImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Đăng bài"/>
+            android:text="Chọn ảnh từ thiết bị"
+            android:backgroundTint="#757575"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Checkbox Đăng tin ẩn danh -->
+        <CheckBox
+            android:id="@+id/cbAnonymous"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Đăng tin ẩn danh (Chỉ Quản trị viên/Giám thị biết danh tính)"
+            android:textColor="#D32F2F"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Nút Submit & Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnSubmitPost"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="ĐĂNG BÀI VIẾT"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#1976D2" />
 
     </LinearLayout>
 </ScrollView>

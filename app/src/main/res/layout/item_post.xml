@@ -12,75 +12,99 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="14dp">
+        android:padding="12dp">
 
+        <!-- Header: Thẻ phân loại LOST/FOUND và Trạng thái -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_marginBottom="8dp">
 
             <TextView
-                android:id="@+id/tvPostType"
+                android:id="@+id/tvCategoryBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#FFEBEE"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="3dp"
                 android:text="MẤT ĐỒ"
-                android:textColor="#D32F2F"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:background="#D32F2F" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
 
             <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="0dp"
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:text="Tiêu đề bài viết"
-                android:textColor="#1F2937"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:text="Đang tìm kiếm"
+                android:textColor="#F57C00"
+                android:textSize="12sp"
+                android:textStyle="italic" />
         </LinearLayout>
 
+        <!-- Tiêu đề đồ vật -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ví da màu nâu đựng thẻ sinh viên"
+            android:textColor="#212121"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Vị trí rơi/nhặt -->
         <TextView
             android:id="@+id/tvLocation"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Địa điểm: gs25"
-            android:textColor="#4B5563"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/tvDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Mô tả chi tiết..."
-            android:textColor="#6B7280"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/tvPhone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="SĐT: 03333351516"
-            android:textColor="#2563EB"
+            android:text="Vị trí: Bàn học tầng 3 Thư viện"
+            android:textColor="#616161"
             android:textSize="13sp"
-            android:textStyle="bold" />
+            android:layout_marginBottom="6dp" />
 
-        <TextView
-            android:id="@+id/tvAuthorName"
-            android:layout_width="wrap_content"
+        <!-- Ảnh bài đăng (Ẩn nếu bài không có ảnh) -->
+        <ImageView
+            android:id="@+id/ivPostImage"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:background="#EEEEEE"
+            android:visibility="gone"
+            android:contentDescription="Ảnh đồ vật"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Người đăng (xử lý hiển thị ẩn danh) & Ngày đăng -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Người đăng: Nguyễn Văn A"
-            android:textColor="#6B7280"
-            android:textSize="12sp"
-            android:textStyle="italic" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvAuthor"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Đăng bởi: Người dùng ẩn danh"
+                android:textColor="#1976D2"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2 giờ trước"
+                android:textColor="#9E9E9E"
+                android:textSize="11sp" />
+        </LinearLayout>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

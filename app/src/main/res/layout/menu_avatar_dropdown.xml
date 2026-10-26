@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_profile"
+        android:title="Hồ sơ cá nhân"
+        android:icon="@android:drawable/ic_menu_myplaces" />
+
+    <item
+        android:id="@+id/menu_friends"
+        android:title="Danh sách bạn bè"
+        android:icon="@android:drawable/ic_menu_share" />
+
+    <item
+        android:id="@+id/menu_logout"
+        android:title="Đăng xuất"
+        android:icon="@android:drawable/ic_lock_power_off" />
+</menu>

@@ -33,8 +33,20 @@
         <activity
             android:name=".CreatePostActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:label="Đăng tin đồ thất lạc" />
+        <activity
+            android:name=".PostDetailActivity"
+            android:exported="false"
+            android:label="Chi tiết bài đăng" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:label="Hồ sơ cá nhân" />
 
+        <activity
+            android:name=".FriendsActivity"
+            android:exported="false"
+            android:label="Danh sách bạn bè" />
     </application>
 
 </manifest>

@@ -52,6 +52,17 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize"
             android:label="Trò chuyện" />
+
+        <!-- Dashboard phòng ban và Quản trị -->
+        <activity
+            android:name=".StaffDashboardActivity"
+            android:exported="false"
+            android:label="Phòng ban SchoolFind" />
+
+        <activity
+            android:name=".AdminDashboardActivity"
+            android:exported="false"
+            android:label="Quản trị SchoolFind" />
     </application>
 
 </manifest>

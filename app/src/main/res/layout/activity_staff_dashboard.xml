@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/sf_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SCHOOLFIND · PHÒNG BAN"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@color/sf_primary" />
+
+        <TextView
+            android:id="@+id/tvStaffName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Xin chào, cán bộ phòng ban"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/sf_text_primary" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="@color/sf_primary">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="24dp"
+                android:text="QUẢN LÝ ĐỒ THẤT LẠC\n\nTiếp nhận – Xác minh – Trao trả"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/white" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Chức năng phòng ban"
+            android:textSize="19sp"
+            android:textStyle="bold"
+            android:textColor="@color/sf_text_primary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStaffReceive"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="14dp"
+            android:text="📦  Tiếp nhận đồ vật"
+            android:textAllCaps="false"
+            app:cornerRadius="14dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStaffVerify"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="10dp"
+            android:text="🔎  Xác minh người nhận đồ"
+            android:textAllCaps="false"
+            app:cornerRadius="14dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStaffHandover"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="10dp"
+            android:text="✅  Quản lý bàn giao đồ"
+            android:textAllCaps="false"
+            app:cornerRadius="14dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStaffScores"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="10dp"
+            android:text="🏆  Hồ sơ điểm thưởng"
+            android:textAllCaps="false"
+            app:cornerRadius="14dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStaffFeed"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Xem bảng tin học đường"
+            android:textAllCaps="false" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStaffLogout"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Đăng xuất"
+            android:textAllCaps="false" />
+    </LinearLayout>
+</ScrollView>

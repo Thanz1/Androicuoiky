@@ -8,6 +8,8 @@ public class User {
     private String classId; // Lớp (ví dụ: D23CNTT, 12A1) để tính điểm thi đua
     private String role;    // "student" hoặc "admin"
     private String avatarUrl;
+    private String studentId;
+    private String accountStatus = "active";
 
     // Bắt buộc phải có constructor rỗng cho Firestore
     public User() {
@@ -21,6 +23,7 @@ public class User {
         this.classId = classId;
         this.role = role;
         this.avatarUrl = avatarUrl;
+        this.accountStatus = "active";
     }
 
     // Getters và Setters
@@ -79,7 +82,6 @@ public class User {
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
     }
-    private String studentId;
 
     public String getStudentId() {
         return studentId;
@@ -87,8 +89,13 @@ public class User {
 
     public void setStudentId(String studentId) {
         this.studentId = studentId;
-
     }
 
+    public String getAccountStatus() {
+        return accountStatus;
+    }
 
+    public void setAccountStatus(String accountStatus) {
+        this.accountStatus = accountStatus;
+    }
 }

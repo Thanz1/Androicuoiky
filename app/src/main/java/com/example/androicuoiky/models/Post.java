@@ -5,7 +5,8 @@ import com.google.firebase.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.ArrayList;
+import java.util.List;
 public class Post {
     private String postId;
     private String userId;        // ID của người đăng thực tế (Admin luôn tra cứu được)
@@ -169,5 +170,17 @@ public class Post {
 
     public void setReactions(Map<String, String> reactions) {
         this.reactions = reactions;
+    }
+    private List<PostMedia> media = new ArrayList<>();
+
+    public List<PostMedia> getMedia() {
+        if (media == null) {
+            media = new ArrayList<>();
+        }
+        return media;
+    }
+
+    public void setMedia(List<PostMedia> media) {
+        this.media = media != null ? media : new ArrayList<>();
     }
 }

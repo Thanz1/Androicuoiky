@@ -1,276 +1,409 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@color/sf_background">
 
-    <!-- Phần cuộn nội dung chi tiết bài viết và bình luận -->
+    <!-- HEADER -->
+    <LinearLayout
+        android:id="@+id/detailToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:background="@color/sf_surface">
+
+        <ImageButton
+            android:id="@+id/btnDetailBack"
+            android:layout_width="42dp"
+            android:layout_height="23dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Quay lại"
+            android:src="@android:drawable/ic_media_previous"
+            app:tint="@color/sf_text_primary" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Chi tiết bài đăng"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/sf_text_primary" />
+    </LinearLayout>
+
+    <!-- NỘI DUNG CUỘN -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollDetail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/detailToolbar"
         android:layout_above="@id/layoutCommentInput"
-        android:padding="14dp">
+        android:fillViewport="true"
+        android:clipToPadding="false">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="12dp">
 
-            <TextView
-                android:id="@+id/tvDetailTitle"
+            <!-- CARD BÀI ĐĂNG -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tiêu đề bài đăng"
-                android:textColor="#212121"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="6dp" />
-
-            <TextView
-                android:id="@+id/tvDetailCategory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="3dp"
-                android:text="MẤT ĐỒ"
-                android:textColor="#FFFFFF"
-                android:background="#D32F2F"
-                android:textSize="12sp"
-                android:layout_marginBottom="10dp" />
-
-            <ImageView
-                android:id="@+id/ivDetailImage"
-                android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:scaleType="centerCrop"
-                android:visibility="gone"
-                android:layout_marginBottom="10dp" />
-
-            <TextView
-                android:id="@+id/tvDetailLocation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Vị trí: ..."
-                android:textSize="14sp"
-                android:textColor="#555555"
-                android:layout_marginBottom="6dp" />
-
-            <!-- Khung tác giả, Nút Kết bạn và Nút Nhắn tin -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="10dp">
-
-                <TextView
-                    android:id="@+id/tvDetailAuthor"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Người đăng: ..."
-                    android:textSize="14sp"
-                    android:textColor="#1976D2" />
-
-                <!-- Nút kết bạn -->
-                <Button
-                    android:id="@+id/btnAddFriend"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="+ Kết bạn"
-                    android:textSize="12sp"
-                    android:visibility="gone"
-                    android:paddingVertical="0dp"
-                    android:paddingHorizontal="10dp" />
-
-                <!-- Nút Nhắn tin kiểu Messenger -->
-                <Button
-                    android:id="@+id/btnOpenChat"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="Nhắn tin"
-                    android:textColor="#0084FF"
-                    android:textSize="12sp"
-                    android:visibility="gone"
-                    android:layout_marginStart="6dp"
-                    android:paddingVertical="0dp"
-                    android:paddingHorizontal="10dp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvDetailDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Mô tả..."
-                android:textSize="15sp"
-                android:textColor="#212121"
-                android:layout_marginBottom="14dp" />
-
-            <!-- Nút xử lý trạng thái & xóa bài của chủ bài -->
-            <Button
-                android:id="@+id/btnMarkResolved"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="XÁC NHẬN ĐÃ TRAO TRẢ XONG"
-                android:backgroundTint="#388E3C"
-                android:visibility="gone"
-                android:layout_marginBottom="6dp" />
-
-            <Button
-                android:id="@+id/btnDeletePost"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="XÓA BÀI ĐĂNG NÀY"
-                android:backgroundTint="#D32F2F"
-                android:visibility="gone"
-                android:layout_marginBottom="12dp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"
-                android:layout_marginVertical="6dp" />
-
-            <!-- Đếm tương tác -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="6dp">
-
-                <TextView
-                    android:id="@+id/tvReactionCount"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="0 lượt tương tác"
-                    android:textSize="12sp"
-                    android:textColor="#757575" />
-
-                <TextView
-                    android:id="@+id/tvCommentCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0 bình luận"
-                    android:textSize="12sp"
-                    android:textColor="#757575" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE" />
-
-            <!-- THANH TƯƠNG TÁC (CẢM XÚC & BÌNH LUẬN) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/sf_surface"
+                app:strokeColor="@color/sf_border"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
-                    android:id="@+id/btnReaction"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:background="?attr/selectableItemBackground"
-                    android:orientation="horizontal">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <TextView
-                        android:id="@+id/tvReactionIcon"
-                        android:layout_width="wrap_content"
+                    <!-- NGƯỜI ĐĂNG -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="👍"
-                        android:textSize="18sp"
-                        android:layout_marginEnd="6dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                    <TextView
-                        android:id="@+id/tvReactionText"
-                        android:layout_width="wrap_content"
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/ivDetailAvatar"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:src="@drawable/ic_avatar_default"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="Ảnh đại diện"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvDetailAuthor"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Học sinh"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/sf_text_primary" />
+
+                            <TextView
+                                android:id="@+id/tvDetailDate"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="Thời gian đăng"
+                                android:textSize="12sp"
+                                android:textColor="@color/sf_text_secondary" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- NHÃN TRẠNG THÁI -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Thích"
-                        android:textColor="#616161"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="16dp">
+
+                        <TextView
+                            android:id="@+id/tvDetailCategory"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="7dp"
+                            android:text="NHẶT ĐƯỢC"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/sf_success" />
+
+                        <TextView
+                            android:id="@+id/tvDetailStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="7dp"
+                            android:text="Đang tìm chủ"
+                            android:textSize="11sp"
+                            android:textColor="@color/sf_warning" />
+                    </LinearLayout>
+
+                    <!-- TIÊU ĐỀ -->
+                    <TextView
+                        android:id="@+id/tvDetailTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text="Tiêu đề bài đăng"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/sf_text_primary" />
+
+                    <!-- NỘI DUNG -->
+                    <TextView
+                        android:id="@+id/tvDetailDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Nội dung bài đăng"
                         android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:lineSpacingExtra="4dp"
+                        android:textColor="@color/sf_text_secondary" />
+
+                    <!-- ĐỊA ĐIỂM -->
+                    <TextView
+                        android:id="@+id/tvDetailLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="📍 Địa điểm"
+                        android:textSize="13sp"
+                        android:textColor="@color/sf_primary" />
+
+                    <!-- ẢNH BÀI ĐĂNG CŨ -->
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivDetailImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:layout_marginTop="14dp"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        android:contentDescription="Ảnh đồ vật"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
+
+                    <!-- ALBUM ẢNH / VIDEO MỚI -->
+                    <LinearLayout
+                        android:id="@+id/layoutDetailMedia"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical"
+                        android:visibility="gone" />
+
+                    <!-- KẾT BẠN / NHẮN TIN -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <Button
+                            android:id="@+id/btnAddFriend"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48dp"
+                            android:text="+ Kết bạn"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            android:visibility="gone" />
+
+                        <Button
+                            android:id="@+id/btnOpenChat"
+                            style="@style/Widget.Material3.Button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="8dp"
+                            android:text="Nhắn tin"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            android:visibility="gone" />
+                    </LinearLayout>
+
+                    <!-- QUẢN LÝ BÀI CỦA MÌNH -->
+                    <Button
+                        android:id="@+id/btnMarkResolved"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Đánh dấu đã xử lý"
+                        android:backgroundTint="@color/sf_success"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/btnDeletePost"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Xóa bài đăng"
+                        android:backgroundTint="@color/sf_danger"
+                        android:visibility="gone" />
+
+                    <!-- THỐNG KÊ TƯƠNG TÁC -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@color/sf_divider" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="12dp">
+
+                        <TextView
+                            android:id="@+id/tvReactionCount"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="0 lượt tương tác"
+                            android:textSize="12sp"
+                            android:textColor="@color/sf_text_secondary" />
+
+                        <TextView
+                            android:id="@+id/tvCommentCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 bình luận"
+                            android:textSize="12sp"
+                            android:textColor="@color/sf_text_secondary" />
+                    </LinearLayout>
+
+                    <!-- THANH CẢM XÚC / BÌNH LUẬN -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/btnReaction"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?attr/selectableItemBackground"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/tvReactionIcon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="👍"
+                                android:textSize="18sp" />
+
+                            <TextView
+                                android:id="@+id/tvReactionText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="Thích"
+                                android:textSize="13sp"
+                                android:textColor="@color/sf_text_secondary" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/btnCommentAction"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?attr/selectableItemBackground"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_comment"
+                                android:contentDescription="Bình luận" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="Bình luận"
+                                android:textSize="13sp"
+                                android:textColor="@color/sf_text_secondary" />
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- DANH SÁCH BÌNH LUẬN -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/sf_surface"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp">
 
                 <LinearLayout
-                    android:id="@+id/btnCommentAction"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:background="?attr/selectableItemBackground"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_comment"
-                        android:layout_marginEnd="6dp" />
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Bình luận"
-                        android:textColor="#616161"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/sf_text_primary"
+                        android:layout_marginBottom="12dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvComments"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" />
                 </LinearLayout>
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"
-                android:layout_marginBottom="12dp" />
-
-            <!-- Danh sách bình luận -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvComments"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
-
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Khung nhập comment cố định ở đáy -->
+    <!-- NHẬP BÌNH LUẬN CỐ ĐỊNH -->
     <LinearLayout
         android:id="@+id/layoutCommentInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="vertical"
-        android:background="#FFFFFF"
-        android:padding="8dp"
-        android:elevation="6dp">
+        android:background="@color/sf_surface"
+        android:elevation="8dp"
+        android:padding="10dp">
 
         <RelativeLayout
             android:id="@+id/layoutCommentPreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_marginBottom="6dp">
+            android:layout_marginBottom="6dp"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/ivCommentPreview"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:scaleType="centerCrop" />
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:scaleType="centerCrop"
+                android:contentDescription="Ảnh bình luận" />
 
             <ImageView
                 android:id="@+id/btnRemovePreview"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_alignTop="@id/ivCommentPreview"
                 android:layout_alignEnd="@id/ivCommentPreview"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
-                android:background="#88000000" />
+                android:background="#88000000"
+                android:contentDescription="Xóa ảnh đã chọn" />
         </RelativeLayout>
 
         <LinearLayout
@@ -281,33 +414,37 @@
 
             <ImageButton
                 android:id="@+id/btnAttachImage"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:src="@android:drawable/ic_menu_camera"
-                app:tint="#757575"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/sf_primary"
                 android:contentDescription="Đính kèm ảnh" />
 
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etComment"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@android:color/transparent"
+                android:layout_marginHorizontal="8dp"
+                android:background="@drawable/bg_sf_comment_input"
                 android:hint="Viết bình luận..."
-                android:padding="10dp"
+                android:padding="12dp"
+                android:minHeight="46dp"
+                android:maxLines="3"
+                android:inputType="textCapSentences|textMultiLine"
                 android:textSize="14sp"
-                android:maxLines="3" />
+                android:textColor="@color/sf_text_primary"
+                android:textColorHint="@color/sf_text_hint" />
 
             <ImageButton
                 android:id="@+id/btnSendComment"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:src="@android:drawable/ic_menu_send"
-                app:tint="#1976D2"
-                android:contentDescription="Gửi" />
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/sf_primary"
+                android:contentDescription="Gửi bình luận" />
         </LinearLayout>
     </LinearLayout>
-
 </RelativeLayout>

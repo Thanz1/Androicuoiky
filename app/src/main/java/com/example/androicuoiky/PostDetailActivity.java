@@ -15,10 +15,12 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -31,6 +33,7 @@ import com.bumptech.glide.Glide;
 import com.example.androicuoiky.adapters.CommentAdapter;
 import com.example.androicuoiky.models.Comment;
 import com.example.androicuoiky.models.Post;
+import com.example.androicuoiky.models.PostMedia;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,16 +45,23 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
 public class PostDetailActivity extends AppCompatActivity {
 
     private TextView tvDetailTitle, tvDetailCategory, tvDetailLocation, tvDetailAuthor, tvDetailDescription;
+    private TextView tvDetailStatus, tvDetailDate;
+    private ImageButton btnDetailBack;
+    private ShapeableImageView ivDetailAvatar;
     private TextView tvReactionCount, tvCommentCount, tvReactionIcon, tvReactionText;
     private ImageView ivDetailImage, ivCommentPreview;
+    private LinearLayout layoutDetailMedia;
+    private VideoView activeVideo;
     private Button btnMarkResolved, btnDeletePost, btnAddFriend, btnOpenChat;
     private LinearLayout btnReaction, btnCommentAction;
     private RelativeLayout layoutCommentPreview;
@@ -106,7 +116,12 @@ public class PostDetailActivity extends AppCompatActivity {
         tvDetailLocation = findViewById(R.id.tvDetailLocation);
         tvDetailAuthor = findViewById(R.id.tvDetailAuthor);
         tvDetailDescription = findViewById(R.id.tvDetailDescription);
+        tvDetailStatus = findViewById(R.id.tvDetailStatus);
+        tvDetailDate = findViewById(R.id.tvDetailDate);
+        btnDetailBack = findViewById(R.id.btnDetailBack);
+        ivDetailAvatar = findViewById(R.id.ivDetailAvatar);
         ivDetailImage = findViewById(R.id.ivDetailImage);
+        layoutDetailMedia = findViewById(R.id.layoutDetailMedia);
         btnMarkResolved = findViewById(R.id.btnMarkResolved);
         btnDeletePost = findViewById(R.id.btnDeletePost);
         btnAddFriend = findViewById(R.id.btnAddFriend);
@@ -136,6 +151,8 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     private void setupEvents() {
+        btnDetailBack.setOnClickListener(v -> finish());
+
         btnCommentAction.setOnClickListener(v -> {
             etComment.requestFocus();
             etComment.setFocusableInTouchMode(true);
@@ -184,28 +201,84 @@ public class PostDetailActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void displayData(Post post) {
         tvDetailTitle.setText(post.getTitle());
-        tvDetailLocation.setText("Vị trí: " + post.getLocation());
+        tvDetailLocation.setText("📍 " + (TextUtils.isEmpty(post.getLocation()) ? "Chưa xác định" : post.getLocation()));
         tvDetailDescription.setText(post.getDescription());
 
+        // Ngày đăng
+        if (post.getCreatedAt() != null) {
+            SimpleDateFormat formatter = new SimpleDateFormat(
+                    "dd/MM/yyyy · HH:mm",
+                    Locale.getDefault()
+            );
+            tvDetailDate.setText(formatter.format(post.getCreatedAtDate()));
+        } else {
+            tvDetailDate.setText("");
+        }
+
+        // Nhãn loại bài đăng
         if ("LOST".equalsIgnoreCase(post.getCategory())) {
-            tvDetailCategory.setText("CẦN TÌM ĐỒ");
+            tvDetailCategory.setText("MẤT ĐỒ");
+            tvDetailCategory.setTextColor(getColor(R.color.sf_danger));
+            tvDetailCategory.setBackgroundTintList(null);
+            tvDetailCategory.setBackgroundColor(getColor(R.color.sf_danger_light));
         } else {
             tvDetailCategory.setText("NHẶT ĐƯỢC");
+            tvDetailCategory.setTextColor(getColor(R.color.sf_success));
+            tvDetailCategory.setBackgroundColor(getColor(R.color.sf_success_light));
+        }
+
+        // Nhãn trạng thái
+        if ("RESOLVED".equalsIgnoreCase(post.getStatus())) {
+            tvDetailStatus.setText("✓ Đã trao trả");
+            tvDetailStatus.setTextColor(getColor(R.color.sf_success));
+            tvDetailStatus.setBackgroundColor(getColor(R.color.sf_success_light));
+        } else {
+            tvDetailStatus.setText(
+                    "LOST".equalsIgnoreCase(post.getCategory())
+                            ? "Đang tìm kiếm"
+                            : "Đang tìm chủ"
+            );
+            tvDetailStatus.setTextColor(getColor(R.color.sf_warning));
+            tvDetailStatus.setBackgroundColor(getColor(R.color.sf_warning_light));
         }
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
         String currentUid = currentUser != null ? currentUser.getUid() : "";
 
         if (post.isAnonymous()) {
-            tvDetailAuthor.setText("Người đăng: Ẩn danh (Đã lưu ID kiểm duyệt)");
+            tvDetailAuthor.setText("Người đăng: Ẩn danh");
+            ivDetailAvatar.setImageResource(R.drawable.ic_avatar_default);
             btnAddFriend.setVisibility(View.GONE);
             btnOpenChat.setVisibility(View.GONE);
         } else {
-            String authorInfo = "Người đăng: " + post.getAuthorName();
+            String authorInfo = TextUtils.isEmpty(post.getAuthorName()) ? "Học sinh" : post.getAuthorName();
             if (!TextUtils.isEmpty(post.getClassId())) {
-                authorInfo += " - Lớp: " + post.getClassId();
+                authorInfo += " · Lớp " + post.getClassId();
             }
             tvDetailAuthor.setText(authorInfo);
+
+            ivDetailAvatar.setImageResource(R.drawable.ic_avatar_default);
+            if (!TextUtils.isEmpty(post.getUserId())) {
+                String authorId = post.getUserId();
+                db.collection("users")
+                        .document(authorId)
+                        .get()
+                        .addOnSuccessListener(document -> {
+                            if (isFinishing() || isDestroyed()) return;
+                            if (document.exists()
+                                    && currentPost != null
+                                    && !currentPost.isAnonymous()
+                                    && authorId.equals(currentPost.getUserId())) {
+                                String avatar = document.getString("avatarUrl");
+                                if (!TextUtils.isEmpty(avatar)) {
+                                    Glide.with(this)
+                                            .load(avatar)
+                                            .circleCrop()
+                                            .into(ivDetailAvatar);
+                                }
+                            }
+                        });
+            }
 
             if (!TextUtils.isEmpty(post.getUserId()) && !post.getUserId().equals(currentUid)) {
                 btnOpenChat.setVisibility(View.VISIBLE);
@@ -216,12 +289,7 @@ public class PostDetailActivity extends AppCompatActivity {
             }
         }
 
-        if (!TextUtils.isEmpty(post.getImageUrl())) {
-            ivDetailImage.setVisibility(View.VISIBLE);
-            Glide.with(this).load(post.getImageUrl()).into(ivDetailImage);
-        } else {
-            ivDetailImage.setVisibility(View.GONE);
-        }
+        displayDetailMedia(post);
 
         if (currentUid.equals(post.getUserId())) {
             btnDeletePost.setVisibility(View.VISIBLE);
@@ -236,6 +304,113 @@ public class PostDetailActivity extends AppCompatActivity {
         }
 
         updateReactionUI();
+    }
+
+    private void displayDetailMedia(Post post) {
+        if (activeVideo != null) {
+            activeVideo.stopPlayback();
+            activeVideo = null;
+        }
+
+        layoutDetailMedia.removeAllViews();
+
+        List<PostMedia> media = new ArrayList<>(post.getMedia());
+
+        // Hỗ trợ bài đăng cũ
+        if (media.isEmpty()
+                && !TextUtils.isEmpty(post.getImageUrl())) {
+            media.add(new PostMedia(
+                    post.getImageUrl(), "IMAGE", ""
+            ));
+        }
+
+        ivDetailImage.setVisibility(View.GONE);
+
+        if (media.isEmpty()) {
+            layoutDetailMedia.setVisibility(View.GONE);
+            return;
+        }
+
+        layoutDetailMedia.setVisibility(View.VISIBLE);
+
+        float density = getResources()
+                .getDisplayMetrics().density;
+
+        int mediaHeight = (int) (260 * density);
+        int marginBottom = (int) (12 * density);
+
+        for (PostMedia item : media) {
+            if (TextUtils.isEmpty(item.getUrl())) continue;
+
+            if ("IMAGE".equals(item.getType())) {
+                ImageView image = new ImageView(this);
+
+                LinearLayout.LayoutParams params =
+                        new LinearLayout.LayoutParams(
+                                -1, mediaHeight
+                        );
+                params.bottomMargin = marginBottom;
+
+                image.setLayoutParams(params);
+                image.setScaleType(
+                        ImageView.ScaleType.FIT_CENTER
+                );
+
+                image.setBackgroundColor(
+                        getColor(R.color.sf_surface_variant)
+                );
+
+                Glide.with(this)
+                        .load(item.getUrl())
+                        .into(image);
+
+                layoutDetailMedia.addView(image);
+
+            } else if ("VIDEO".equals(item.getType())) {
+                VideoView videoView = new VideoView(this);
+
+                LinearLayout.LayoutParams params =
+                        new LinearLayout.LayoutParams(
+                                -1, mediaHeight
+                        );
+                params.bottomMargin = marginBottom;
+
+                videoView.setLayoutParams(params);
+                videoView.setVideoURI(
+                        Uri.parse(item.getUrl())
+                );
+
+                MediaController controller =
+                        new MediaController(this);
+
+                controller.setAnchorView(videoView);
+                videoView.setMediaController(controller);
+
+                // Người dùng bấm để phát video
+                videoView.setOnClickListener(v -> {
+                    if (!videoView.isPlaying()) {
+                        if (activeVideo != null &&
+                                activeVideo != videoView) {
+                            activeVideo.pause();
+                        }
+                        activeVideo = videoView;
+                        videoView.start();
+                    } else {
+                        videoView.pause();
+                    }
+                });
+
+                layoutDetailMedia.addView(videoView);
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        if (activeVideo != null) {
+            activeVideo.pause();
+        }
+        super.onStop();
     }
 
     // Hiển thị Mini Profile Dialog khi bấm vào Avatar người comment

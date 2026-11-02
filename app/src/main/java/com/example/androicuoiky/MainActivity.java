@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.androicuoiky.adapters.PostAdapter;
 import com.example.androicuoiky.models.Post;
+import com.example.androicuoiky.models.PostMedia;
+import java.util.Map;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -153,32 +155,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ivUserAvatar.setOnClickListener(v -> {
-            PopupMenu popup = new PopupMenu(MainActivity.this, v);
-            popup.getMenuInflater().inflate(R.menu.menu_avatar_dropdown, popup.getMenu());
-            popup.setOnMenuItemClickListener(item -> {
-                int id = item.getItemId();
-                if (id == R.id.menu_profile) {
-                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-                    return true;
-                } else if (id == R.id.menu_friends) {
-                    startActivity(new Intent(MainActivity.this, FriendsActivity.class));
-                    return true;
-                } else if (id == R.id.menu_logout) {
-                    // Cập nhật offline trước khi đăng xuất
-                    UserStatusManager.setStatus(false);
-
-                    mAuth.signOut();
-                    Toast.makeText(MainActivity.this, "Đã đăng xuất thành công!", Toast.LENGTH_SHORT).show();
-
-                    Intent intent = new Intent(MainActivity.this, AuthActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
-                    return true;
-                }
-                return false;
-            });
-            popup.show();
+            Intent intent = new Intent(
+                    MainActivity.this,
+                    ProfileActivity.class
+            );
+            startActivity(intent);
         });
     }
 
@@ -208,6 +189,28 @@ public class MainActivity extends AppCompatActivity {
                                 post.setCategory(doc.getString("category"));
                                 post.setImageUrl(doc.getString("imageUrl"));
                                 post.setStatus(doc.getString("status"));
+
+                                List<PostMedia> mediaList = new ArrayList<>();
+                                Object rawMedia = doc.get("media");
+                                if (rawMedia instanceof List<?>) {
+                                    for (Object entry : (List<?>) rawMedia) {
+                                        if (entry instanceof Map<?, ?>) {
+                                            Map<?, ?> map = (Map<?, ?>) entry;
+                                            Object url = map.get("url");
+                                            Object type = map.get("type");
+                                            Object path = map.get("storagePath");
+                                            if (url instanceof String && type instanceof String) {
+                                                mediaList.add(new PostMedia(
+                                                        (String) url,
+                                                        (String) type,
+                                                        path instanceof String ? (String) path : ""
+                                                ));
+                                            }
+                                        }
+                                    }
+                                }
+                                post.setMedia(mediaList);
+
                                 Boolean isAnonymous = doc.getBoolean("isAnonymous");
                                 post.setAnonymous(isAnonymous != null ? isAnonymous : false);
                                 Boolean isScoreApproved = doc.getBoolean("isScoreApproved");

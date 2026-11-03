@@ -11,7 +11,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -82,9 +81,10 @@ public class MainActivity extends AppCompatActivity {
         // 3. Khởi tạo Avatar và Menu Dropdown
         setupAvatarDropdown();
 
-        // 4. Bấm nút tin nhắn tròn trên toolbar
+        // 4. Bấm nút tin nhắn tròn trên toolbar -> Chuyển sang màn hình nhắn tin / danh sách bạn bè để chat nhanh
         if (btnToolbarMessages != null) {
             btnToolbarMessages.setOnClickListener(v -> {
+                // Chuyển sang màn hình bạn bè để người dùng chọn người muốn trò chuyện (như tính năng chat của Messenger)
                 Intent intent = new Intent(MainActivity.this, FriendsActivity.class);
                 startActivity(intent);
             });
@@ -115,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // Kiểm tra phiên làm việc: chưa đăng nhập thì đẩy về AuthActivity
         if (mAuth.getCurrentUser() == null) {
             Intent intent = new Intent(MainActivity.this, AuthActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -127,14 +126,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Cập nhật trạng thái trực tuyến
         UserStatusManager.setStatus(true);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        // Cập nhật trạng thái ngoại tuyến khi ẩn/thoát app
         UserStatusManager.setStatus(false);
     }
 
@@ -155,10 +152,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ivUserAvatar.setOnClickListener(v -> {
-            Intent intent = new Intent(
-                    MainActivity.this,
-                    ProfileActivity.class
-            );
+            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
         });
     }

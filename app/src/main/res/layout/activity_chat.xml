@@ -53,7 +53,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <!-- Trạng thái động: mặc định để Đang kết nối... -->
+                <!-- Trạng thái động -->
                 <TextView
                     android:id="@+id/tvReceiverStatus"
                     android:layout_width="wrap_content"
@@ -84,20 +84,32 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:background="#F0F2F5"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="8dp">
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="6dp">
+
+        <!-- Nút chọn gửi mã xác nhận đồ nhặt được -->
+        <ImageButton
+            android:id="@+id/btnSendClaimCode"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_key"
+            app:tint="#0084FF"
+            android:contentDescription="Gửi mã xác nhận" />
 
         <EditText
             android:id="@+id/etMessageInput"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:background="@android:color/transparent"
             android:hint="Nhắn tin..."
             android:textColor="#050505"
             android:textSize="15sp"
             android:maxLines="4"
-            android:paddingHorizontal="10dp"
+            android:paddingHorizontal="8dp"
             android:paddingVertical="8dp" />
 
         <ImageButton

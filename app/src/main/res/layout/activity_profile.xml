@@ -284,6 +284,31 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Quản lý bạn bè -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="@color/sf_surface"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnViewFriends"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="👥 Quản lý danh sách bạn bè"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Bảo mật và đăng xuất -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"

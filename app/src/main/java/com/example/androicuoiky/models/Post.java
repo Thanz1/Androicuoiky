@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
+
 public class Post {
     private String postId;
     private String userId;        // ID của người đăng thực tế (Admin luôn tra cứu được)
@@ -20,7 +21,11 @@ public class Post {
     private String status;        // "PENDING" (đang tìm/chờ trả), "RESOLVED" (đã trả/đã nhận lại)
     private boolean isAnonymous;  // True: Ẩn danh với người dùng thường (chỉ Admin thấy UID/Tên thật)
     private boolean isScoreApproved; // True: Đã được Admin duyệt cộng điểm thi đua cho lớp
-    private Object createdAt;
+    Object createdAt;
+
+    // Các trường mới cho Mã xác nhận đồ thất lạc
+    private String verificationCode;
+    private String claimStatus = "PENDING"; // "PENDING" (chờ nhận) hoặc "COMPLETED" (đã trao/nhận)
 
     // Bắt buộc constructor rỗng cho Firestore
     public Post() {
@@ -159,10 +164,25 @@ public class Post {
         }
         return new Date();
     }
-    // Thêm trường này vào trong class Post:
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
+
+    public String getClaimStatus() {
+        return claimStatus != null ? claimStatus : "PENDING";
+    }
+
+    public void setClaimStatus(String claimStatus) {
+        this.claimStatus = claimStatus;
+    }
+
     private Map<String, String> reactions = new HashMap<>();
 
-    // Thêm Getter và Setter:
     public Map<String, String> getReactions() {
         if (reactions == null) reactions = new HashMap<>();
         return reactions;
@@ -171,6 +191,7 @@ public class Post {
     public void setReactions(Map<String, String> reactions) {
         this.reactions = reactions;
     }
+
     private List<PostMedia> media = new ArrayList<>();
 
     public List<PostMedia> getMedia() {

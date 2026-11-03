@@ -51,7 +51,6 @@ public class CreatePostActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private FirebaseStorage storage;
 
-    // Bộ nhận kết quả chọn nhiều ảnh và video từ thư viện
     private final ActivityResultLauncher<Intent> mediaPickerLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
@@ -83,12 +82,10 @@ public class CreatePostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
 
-        // Khởi tạo Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
 
-        // Ánh xạ View
         etTitle = findViewById(R.id.etTitle);
         etLocation = findViewById(R.id.etLocation);
         etDescription = findViewById(R.id.etDescription);
@@ -176,12 +173,10 @@ public class CreatePostActivity extends AppCompatActivity {
             List<PostMedia> uploaded,
             Post newPost
     ) {
-        // Hoàn thành upload
         if (index >= selectedMediaUris.size()) {
 
             newPost.setMedia(uploaded);
 
-            // Giữ tương thích bài đăng cũ
             for (PostMedia item : uploaded) {
                 if ("IMAGE".equals(item.getType())) {
                     newPost.setImageUrl(item.getUrl());
@@ -205,7 +200,6 @@ public class CreatePostActivity extends AppCompatActivity {
         }
 
         Uri uri = selectedMediaUris.get(index);
-
         String mime = getContentResolver().getType(uri);
 
         if (mime == null || !(mime.startsWith("image/")
@@ -215,7 +209,6 @@ public class CreatePostActivity extends AppCompatActivity {
             return;
         }
 
-        // Giới hạn dung lượng từng file để bảo vệ tài nguyên
         long size = getFileSize(uri);
         long maxSize = mime.startsWith("video/")
                 ? 100L * 1024 * 1024
@@ -298,7 +291,6 @@ public class CreatePostActivity extends AppCompatActivity {
 
         setLoading(true);
 
-        // Lấy thông tin lớp và tên người dùng hiện tại từ Firestore
         db.collection("users").document(currentUser.getUid()).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     String authorName = currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "Học sinh";
@@ -313,6 +305,12 @@ public class CreatePostActivity extends AppCompatActivity {
                     }
 
                     String postId = db.collection("posts").document().getId();
+
+                    // Sinh mã xác nhận tự động nếu là đồ nhặt được (FOUND)
+                    String verificationCode = "";
+                    if ("FOUND".equals(category)) {
+                        verificationCode = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+                    }
 
                     Post newPost = new Post(
                             postId,
@@ -329,6 +327,9 @@ public class CreatePostActivity extends AppCompatActivity {
                             false,
                             Timestamp.now()
                     );
+
+                    newPost.setVerificationCode(verificationCode);
+                    newPost.setClaimStatus("PENDING");
 
                     uploadMediaSequentially(
                             0,

@@ -1,5 +1,6 @@
 package com.example.androicuoiky;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -41,7 +42,20 @@ public class FriendsActivity extends AppCompatActivity {
         tvEmptyFriends = findViewById(R.id.tvEmptyFriends);
 
         rvFriends.setLayoutManager(new LinearLayoutManager(this));
-        friendAdapter = new FriendAdapter(this, friendList, this::removeFriend);
+        friendAdapter = new FriendAdapter(this, friendList, new FriendAdapter.OnFriendActionListener() {
+            @Override
+            public void onFriendClick(User friend) {
+                Intent intent = new Intent(FriendsActivity.this, ChatActivity.class);
+                intent.putExtra("RECEIVER_ID", friend.getUid());
+                intent.putExtra("RECEIVER_NAME", friend.getFullName());
+                startActivity(intent);
+            }
+
+            @Override
+            public void onRemoveFriend(User friend) {
+                removeFriend(friend);
+            }
+        });
         rvFriends.setAdapter(friendAdapter);
 
         loadFriends();

@@ -63,8 +63,8 @@
                     android:background="@drawable/bg_circle_icon"
                     android:contentDescription="Tin nhắn"
                     android:scaleType="centerInside"
-                    android:src="@drawable/ic_messenger" />
-
+                    android:src="@drawable/ic_messenger"
+                    app:tint="#0084FF" />
                 <!-- Avatar tài khoản cá nhân -->
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/ivUserAvatar"

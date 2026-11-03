@@ -46,6 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private Button btnChangeAvatar;
     private Button btnSaveProfile;
+    private Button btnViewFriends;
     private Button btnResetPassword;
     private Button btnLogoutProfile;
     private ImageButton btnProfileBack;
@@ -101,6 +102,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         btnChangeAvatar = findViewById(R.id.btnChangeAvatar);
         btnSaveProfile = findViewById(R.id.btnSaveProfile);
+        btnViewFriends = findViewById(R.id.btnViewFriends);
         btnResetPassword = findViewById(R.id.btnResetPassword);
         btnLogoutProfile = findViewById(R.id.btnLogoutProfile);
         btnProfileBack = findViewById(R.id.btnProfileBack);
@@ -116,18 +118,16 @@ public class ProfileActivity extends AppCompatActivity {
 
         btnSaveProfile.setOnClickListener(v -> saveProfile());
 
+        // Sự kiện mở danh sách bạn bè từ hồ sơ cá nhân
+        btnViewFriends.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, FriendsActivity.class);
+            startActivity(intent);
+        });
+
         btnResetPassword.setOnClickListener(v ->
                 confirmResetPassword());
 
-        btnLogoutProfile.setOnClickListener(v -> {
-            Toast.makeText(
-                    ProfileActivity.this,
-                    "Đã nhận sự kiện bấm đăng xuất",
-                    Toast.LENGTH_SHORT
-            ).show();
-
-            confirmLogout();
-        });
+        btnLogoutProfile.setOnClickListener(v -> confirmLogout());
     }
 
     private void loadCurrentUserData() {
@@ -294,7 +294,6 @@ public class ProfileActivity extends AppCompatActivity {
             return;
         }
 
-        // Tạo đường dẫn mới để tránh Glide giữ ảnh cũ.
         String path = "avatars/" + uid + "/"
                 + UUID.randomUUID();
 
@@ -343,7 +342,6 @@ public class ProfileActivity extends AppCompatActivity {
         changes.put("phoneNumber", phone);
         changes.put("avatarUrl", avatarUrl);
 
-        // Không cập nhật role, studentId, classId, email.
         db.collection("users")
                 .document(uid)
                 .update(changes)
@@ -397,36 +395,28 @@ public class ProfileActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Đăng xuất tài khoản")
                 .setMessage("Bạn có chắc muốn đăng xuất khỏi SchoolFind?")
-                .setNegativeButton("Hủy", (dialog, which) -> {
-                    dialog.dismiss();
-                })
-                .setPositiveButton("Đăng xuất", (dialog, which) -> {
-                    performLogout();
-                })
+                .setNegativeButton("Hủy", null)
+                .setPositiveButton("Đăng xuất", (dialog, which) -> performLogout())
                 .show();
     }
 
     private void performLogout() {
-        // Cập nhật offline trước khi đăng xuất
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             try {
                 UserStatusManager.setStatus(false);
             } catch (Exception ignored) {}
         }
 
-        // Đăng xuất Firebase Authentication
         FirebaseAuth.getInstance().signOut();
 
-        // Quay về màn hình đăng nhập
         Intent intent = new Intent(
                 ProfileActivity.this,
                 AuthActivity.class
         );
 
-        // Xóa các màn hình cũ khỏi back stack
         intent.addFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK
-                | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
         );
 
         startActivity(intent);

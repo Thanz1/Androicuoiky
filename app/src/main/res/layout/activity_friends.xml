@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Danh Sách Bạn Bè"
+        android:text="Tin Nhắn / Danh Sách Bạn Bè"
         android:textColor="#212121"
         android:textSize="20sp"
         android:textStyle="bold"

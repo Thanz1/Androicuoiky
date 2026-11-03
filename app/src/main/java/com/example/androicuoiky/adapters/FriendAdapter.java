@@ -21,6 +21,7 @@ import java.util.List;
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
 
     public interface OnFriendActionListener {
+        void onFriendClick(User friend);
         void onRemoveFriend(User friend);
     }
 
@@ -52,6 +53,10 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         } else {
             holder.ivFriendAvatar.setImageResource(R.drawable.ic_avatar_default);
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onFriendClick(friend);
+        });
 
         holder.btnRemoveFriend.setOnClickListener(v -> {
             if (listener != null) listener.onRemoveFriend(friend);
